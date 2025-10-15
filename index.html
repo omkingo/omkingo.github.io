@@ -174,19 +174,9 @@
             showStatus('loading', 'กำลังเปิดประตู...');
             openButton.disabled = true;
 
-            const payload = {
-                action: 'open_gate',
-                timestamp: new Date().toISOString(),
-                webhookName: 'sample.webhook'
-            };
-
             try {
                 const response = await fetch(WEBHOOK_URL, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
+                    method: 'GET'
                 });
 
                 if (response.ok) {
