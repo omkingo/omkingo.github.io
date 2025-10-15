@@ -178,8 +178,7 @@
                 console.log('Calling webhook:', WEBHOOK_URL);
                 
                 const response = await fetch(WEBHOOK_URL, {
-                    method: 'GET',
-                    mode: 'no-cors'
+                    method: 'GET'
                 });
 
                 console.log('Response status:', response.status);
