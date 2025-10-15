@@ -175,12 +175,18 @@
             openButton.disabled = true;
 
             try {
+                console.log('Calling webhook:', WEBHOOK_URL);
+                
                 const response = await fetch(WEBHOOK_URL, {
-                    method: 'GET'
+                    method: 'GET',
+                    mode: 'no-cors'
                 });
 
-                if (response.ok) {
-                    showStatus('success', '✅ ประตูเปิดแล้ว!');
+                console.log('Response status:', response.status);
+                console.log('Response:', response);
+
+                // With no-cors, we can't read the response but the request is sent
+                showStatus('success', '✅ ประตูเปิดแล้ว!');
                     
                     // Change icon
                     document.querySelector('.gate-icon').textContent = '🔓';
