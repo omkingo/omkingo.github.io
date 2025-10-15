@@ -1,10 +1,225 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <title>My GitHub Pages Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เปิดประตู</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .gate-icon {
+            font-size: 120px;
+            margin-bottom: 30px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #718096;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .open-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .open-button:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .open-button:active:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .open-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status.loading {
+            background: #bee3f8;
+            color: #2c5282;
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World</h1>
-    <p>This is my GitHub Pages site.</p>
+    <div class="container">
+        <div class="gate-icon">🚪</div>
+        
+        <h1>เปิดประตู</h1>
+        <p>กดปุ่มเพื่อเปิดประตู</p>
+
+        <button class="open-button" id="openButton">
+            <span>🔓</span>
+            <span>เปิดประตู</span>
+        </button>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        // ============================================
+        // 🔧 ตั้งค่า Webhook URL ตรงนี้
+        // ============================================
+        const WEBHOOK_URL = 'https://dodecastyle-noncentrally-nasir.ngrok-free.dev/webhook/ios-shortcut';
+        // ============================================
+
+        const openButton = document.getElementById('openButton');
+        const statusDiv = document.getElementById('status');
+
+        async function openGate() {
+            showStatus('loading', 'กำลังเปิดประตู...');
+            openButton.disabled = true;
+
+            const payload = {
+                action: 'open_gate',
+                timestamp: new Date().toISOString(),
+                webhookName: 'sample.webhook'
+            };
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showStatus('success', '✅ ประตูเปิดแล้ว!');
+                    
+                    // Change icon
+                    document.querySelector('.gate-icon').textContent = '🔓';
+                    
+                    setTimeout(() => {
+                        document.querySelector('.gate-icon').textContent = '🚪';
+                        openButton.disabled = false;
+                        statusDiv.style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showStatus('error', `❌ เกิดข้อผิดพลาด: ${error.message}`);
+                openButton.disabled = false;
+            }
+        }
+
+        function showStatus(type, message) {
+            statusDiv.className = `status ${type}`;
+            
+            if (type === 'loading') {
+                statusDiv.innerHTML = `<span class="spinner"></span> ${message}`;
+            } else {
+                statusDiv.textContent = message;
+            }
+        }
+
+        openButton.addEventListener('click', openGate);
+    </script>
 </body>
 </html>
