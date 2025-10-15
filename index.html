@@ -164,7 +164,7 @@
         // ============================================
         // 🔧 ตั้งค่า Webhook URL ตรงนี้
         // ============================================
-        const WEBHOOK_URL = 'https://dodecastyle-noncentrally-nasir.ngrok-free.dev/webhook/ios-shortcut';
+        const WEBHOOK_URL = 'https://your-n8n-instance.com/webhook/sample.webhook';
         // ============================================
 
         const openButton = document.getElementById('openButton');
@@ -185,8 +185,10 @@
                 console.log('Response status:', response.status);
                 console.log('Response:', response);
 
-                // With no-cors, we can't read the response but the request is sent
-                showStatus('success', '✅ ประตูเปิดแล้ว!');
+                if (response.ok) {
+                    const data = await response.text();
+                    console.log('Response data:', data);
+                    showStatus('success', '✅ ประตูเปิดแล้ว!');
                     
                     // Change icon
                     document.querySelector('.gate-icon').textContent = '🔓';
