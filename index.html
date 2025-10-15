@@ -58,6 +58,30 @@
             margin-bottom: 40px;
         }
 
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: #a0aec0;
+        }
+
         .open-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -146,7 +170,17 @@
     <div class="container">
         <div class="gate-icon">🚪</div>
         
-        <p>กดปุ่มเพื่อเปิดประตู</p>
+        <p>กรุณาใส่ชื่อและกดปุ่มเพื่อเปิดประตู</p>
+
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="nameInput" 
+                class="input-field" 
+                placeholder="ใส่ชื่อ"
+                autocomplete="name"
+            >
+        </div>
 
         <button class="open-button" id="openButton">
             <span>🔓</span>
@@ -164,15 +198,26 @@
         const openButton = document.getElementById('openButton');
         const statusDiv = document.getElementById('status');
         const hiddenFrame = document.getElementById('hiddenFrame');
+        const nameInput = document.getElementById('nameInput');
 
         function openGate() {
+            const userName = nameInput.value.trim();
+
+            if (!userName) {
+                alert('กรุณาใส่ชื่อก่อนสิจ๊ะ อย่ามาเนียนนนนน! 😊');
+                nameInput.focus();
+                return;
+            }
+
             showStatus('loading', 'กำลังเปิดประตู...');
             openButton.disabled = true;
 
-            console.log('Opening URL:', WEBHOOK_URL);
+            const urlWithParams = WEBHOOK_URL + '?name=' + encodeURIComponent(userName);
+
+            console.log('Opening URL:', urlWithParams);
             
             // เปิด URL ใน iframe เหมือนเปิด browser ตรงๆ
-            hiddenFrame.src = WEBHOOK_URL;
+            hiddenFrame.src = urlWithParams;
             
             // แสดงสถานะสำเร็จหลังจาก 1 วินาที
             setTimeout(() => {
